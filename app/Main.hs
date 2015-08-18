@@ -69,11 +69,12 @@ addTuple (a, b) (c, d) = (a + c, b + d)
 -- Almost the same as addTuple but with an initial argument that defines the
 -- bounds that new tuples cannot exceed
 boundAddTuple :: (Int, Int) -> (Int, Int) -> (Int, Int) -> (Int, Int)
-boundAddTuple (xUpper, yUpper) old new = (min xUpper newX, min yUpper newY)
+boundAddTuple (xUpper, yUpper) old new = (limit xUpper newX, limit yUpper newY)
     where
         added = addTuple old new
         newX = fst added
         newY = snd added
+        limit upper value = max 0 $ min upper value
 
 
 main :: IO ()
