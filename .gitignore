@@ -1,3 +1,4 @@
 .envrc
 .stack-work
 dist
+.stylish-haskell.yaml
