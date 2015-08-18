@@ -139,6 +139,14 @@ addTuple :: (Int, Int) -> (Int, Int) -> (Int, Int)
 addTuple (a, b) (c, d) = (a + c, b + d)
 
 
+boundAddTuple :: (Int, Int) -> (Int, Int) -> (Int, Int) -> (Int, Int)
+boundAddTuple (xUpper, yUpper) old new = (min xUpper newX, min yUpper newY)
+    where
+        added = addTuple old new
+        newX = fst added
+        newY = snd added
+
+
 main :: IO ()
 main = do
     instructions <- getInstructions
@@ -150,10 +158,12 @@ main = do
     when (isNothing directions) (TIO.putStrLn "No directions found" >> exitFailure)
 
     let initialValues = mkSetup digitLines
-    let roombaPositions = fmap (scanl addTuple (startPosition initialValues)) (doLetters directions)
+    let roombaPositions = fmap (scanl (boundAddTuple $ gridSize initialValues) (startPosition initialValues)) (doLetters directions)
     let cleanedTrash = filter (\p -> maybe False (elem p) roombaPositions) (trashPositions initialValues)
-    print $ fmap head roombaPositions
-    print $ fmap last roombaPositions
+
+    case last <$> roombaPositions of
+      Just (x, y) -> putStrLn $ show x ++ " " ++ show y
+      Nothing     -> print ("No positions detected"::String)
     print $ length cleanedTrash
 
     -- initialise a blank grid to the given dimensions
@@ -171,4 +181,3 @@ main = do
     -- transpose [[1,2,3],[4,5,6]] == [[1,4],[2,5],[3,6]]
     let combined = listToGrid $ map combine (transpose tiles)
     TIO.putStrLn $ showGrid combined
-    TIO.putStrLn "done"
